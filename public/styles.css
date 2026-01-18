@@ -1,0 +1,47 @@
+/* 
+  Estilos Globales - Sistema Contable 
+*/
+
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Menú Overlay para evitar desplazar contenido en móviles */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        position: absolute;
+        top: 60px;
+        /* Debajo de la barra principal */
+        right: 15px;
+        z-index: 1050;
+        background-color: #212529;
+        /* bg-dark */
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+        width: 250px;
+        /* Ancho fijo para el menú flotante listado */
+    }
+
+    .navbar-nav {
+        align-items: flex-end !important;
+        text-align: right !important;
+    }
+
+    .nav-link {
+        padding: 0.5rem 1rem;
+        width: 100%;
+    }
+}
+
+/* Animación suave para el menú */
+.collapsing {
+    transition: height 0.3s ease, opacity 0.3s ease;
+}
+
+/* Ajustes generales */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.25rem;
+}

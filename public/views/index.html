@@ -1,0 +1,33 @@
+<div data-controller="SistemaContable">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <h1 class="text-primary m-0">👥 Gestión de Empleados</h1>
+        <div class="d-flex gap-2 flex-grow-1 flex-md-grow-0">
+            <input type="text" id="buscarEmpleado" class="form-control" placeholder="🔍 Buscar por DNI o Nombre..."
+                style="max-width: 300px;">
+            <button class="btn btn-success" data-view="usuario/registroUsuarios.html">Añadir Empleado</button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>DNI</th>
+                            <th>Nombre Completo</th>
+                            <th>Teléfono</th>
+                            <th>Dirección</th>
+                            <th class="text-end px-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaEmpleadosTabla">
+                        <tr>
+                            <td colspan="5" class="text-center py-4">Cargando empleados...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

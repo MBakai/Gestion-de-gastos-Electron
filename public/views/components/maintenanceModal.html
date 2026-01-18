@@ -1,0 +1,44 @@
+<div class="modal fade" id="maintenanceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-dark text-white py-3">
+                <h5 class="modal-title fw-bold">🛠️ Mantenimiento de Base de Datos</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="alert alert-warning border-0 shadow-sm mb-4">
+                    <div class="d-flex">
+                        <i class="fs-3 me-3">⚠️</i>
+                        <div>
+                            <h6 class="fw-bold mb-1">Acción Irreversible</h6>
+                            <p class="small mb-0">Se eliminarán todos los registros de gastos con más de <strong>1 año
+                                    de
+                                    antigüedad</strong>. Se creará una copia de seguridad automáticamente antes de
+                                proceder.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="small text-muted mb-3 text-center">Confirma tu identidad para continuar:</p>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Nickname</label>
+                    <input type="text" id="maintNickname" class="form-control border-2" placeholder="Tu usuario">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">Contraseña</label>
+                    <input type="password" id="maintPassword" class="form-control border-2" placeholder="••••••••">
+                </div>
+
+                <div id="maintStatus" class="d-none alert py-2 small border-0 mb-0"></div>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-dark px-4 fw-bold" id="btnEjecutarMantenimiento">
+                    🚀 Iniciar Limpieza
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

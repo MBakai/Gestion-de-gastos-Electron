@@ -1,0 +1,26 @@
+# Dependencias
+node_modules/
+
+# Archivos de Compilación
+dist/
+dist-installer/
+
+# Base de Datos y Temporales
+*.db
+*.db-journal
+*.sqlite
+backups/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Entorno y Configuración de IDE
+.env
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Otros
+*.tmp

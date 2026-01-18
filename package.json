@@ -1,0 +1,35 @@
+{
+  "name": "sistema-contable",
+  "version": "1.0.0",
+  "description": "Sistema contable para empleados",
+  "main": "dist/main.js",
+  "scripts": {
+    "build:main": "tsc -p tsconfig.json",
+    "build:renderer": "tsc -p tsconfig.renderer.json",
+    "watch": "tsc --watch",
+    "start": "npm run build && electron .",
+    "dev": "npm run build:main && npm run build:renderer && electron . --inspect",
+    "copy:views": "copyfiles -u 1 public/**/* dist/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/electron": "^1.4.38",
+    "@types/node": "^24.7.2",
+    "copyfiles": "^2.4.1",
+    "electron": "^38.2.2",
+    "electron-rebuild": "^3.2.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.1",
+    "bootstrap": "^5.3.8",
+    "jspdf": "^4.0.0",
+    "jspdf-autotable": "^5.0.7"
+  }
+}

@@ -1,0 +1,72 @@
+<div data-controller="SistemaContable" class="container-fluid py-2">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <h1 class="text-primary h3 m-0 fw-bold">✍️ Registro de Gastos</h1>
+    </div>
+
+    <div class="row">
+        <!-- Registro Individual -->
+        <div class="col-lg-5">
+            <div class="card shadow border-0 mb-4 h-100">
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="mb-0 fw-bold">📝 Registro Individual</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Empleado</label>
+                        <select id="selectEmpleado" class="form-select border-2">
+                            <option value="">Seleccionar empleado...</option>
+                        </select>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold small">Fecha</label>
+                            <input type="date" id="fechaGasto" class="form-control border-2">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold small">Ruta (Destino/Trayecto)</label>
+                            <input type="text" id="rutaGasto" class="form-control border-2" placeholder="Obligatorio">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Monto (Opcional)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" id="montoGasto" class="form-control border-2" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">Descripción (Concepto - Opcional)</label>
+                        <input type="text" id="descripcionGasto" class="form-control border-2"
+                            placeholder="Ej: Peajes, Alimentación...">
+                    </div>
+                    <button id="btnRegistrarGasto" class="btn btn-success w-100 py-3 fw-bold shadow-sm">
+                        🚀 Guardar Gasto
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registro por Lote -->
+        <div class="col-lg-7">
+            <div class="card shadow border-0 mb-4 h-100">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0 fw-bold">⚡ Carga Masiva (Batch)</h5>
+                </div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="alert alert-info py-2 small mb-3 border-0">
+                        <i class="me-1">💡</i> Usa el formato: <code>Concepto: Valor</code><br>
+                        <span class="text-xs">Ej: <code>Gasolina: 3000</code></span>
+                    </div>
+                    <textarea id="inputGastosLote" class="form-control flex-grow-1 border-2 font-monospace small"
+                        rows="12"
+                        placeholder="Copia y pega la lista aquí...&#10;Gasto 1: 5000&#10;Gasto 2: 2500 - Ruta X"></textarea>
+                    <div class="mt-4">
+                        <button id="btnProcesarLote" class="btn btn-primary w-100 py-3 fw-bold shadow-sm">
+                            ⚙️ Procesar y Guardar Todos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

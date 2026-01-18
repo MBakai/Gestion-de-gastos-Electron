@@ -1,0 +1,129 @@
+<div data-controller="SistemaContable" id="viewDetalleEmpleado">
+    <div class="mb-3">
+        <button class="btn btn-outline-secondary" data-view="index.html">← Volver al listado</button>
+    </div>
+
+    <div class="row">
+        <!-- Información del Empleado -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">👤 Información Personal</h5>
+                </div>
+                <div class="card-body">
+                    <form id="formEditarEmpleado">
+                        <input type="hidden" id="editId">
+                        <div class="mb-2">
+                            <label class="form-label small">DNI</label>
+                            <input type="number" id="editDNI" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Nombre</label>
+                            <input type="text" id="editNombre" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Apellido</label>
+                            <input type="text" id="editApellido" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Teléfono</label>
+                            <input type="number" id="editTel" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Dirección</label>
+                            <input type="text" id="editAddress" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small">Edad</label>
+                            <input type="number" id="editEdad" class="form-control form-control-sm">
+                        </div>
+                        <button type="button" id="btnGuardarEmpleado" class="btn btn-primary btn-sm w-100">Guardar
+                            Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gastos y Acciones -->
+        <div class="col-md-8">
+            <!-- Registrar Gasto Rápido -->
+            <div class="card shadow-sm mb-4 bg-light">
+                <div class="card-body">
+                    <h6 class="text-secondary border-bottom pb-2 mb-3">➕ Registrar Gasto para <span
+                            id="nombreDetalleEmpleado">...</span></h6>
+                    <div class="row g-2 row-cols-1 row-cols-md-3 row-cols-lg-4">
+                        <div class="col">
+                            <input type="number" id="montoGasto" class="form-control form-control-sm"
+                                placeholder="Monto">
+                        </div>
+                        <div class="col">
+                            <input type="text" id="descripcionGasto" class="form-control form-control-sm"
+                                placeholder="Descripción">
+                        </div>
+                        <div class="col">
+                            <input type="text" id="rutaGasto" class="form-control form-control-sm"
+                                placeholder="Ruta (Obligatorio)">
+                        </div>
+                        <div class="col-12 col-lg-auto ms-lg-auto">
+                            <button id="btnRegistrarGasto" class="btn btn-success btn-sm w-100">Añadir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial de Gastos -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white p-2">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <h5 class="mb-0 fs-6 me-2">📑 Historial de Gastos</h5>
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <select id="filtroTipo" class="form-select form-select-sm w-auto">
+                                <option value="dia">Día específico</option>
+                                <option value="rango">Rango (Desde / Hasta)</option>
+                                <option value="mes">Mes completo</option>
+                                <option value="todo">Todo el historial</option>
+                            </select>
+                            <div id="contenedorFiltroFechas" class="d-flex flex-wrap gap-1 align-items-center">
+                                <span id="labelFiltroDesde" class="small text-white-50 d-none">Desde:</span>
+                                <input type="date" id="filtroFecha" class="form-control form-control-sm w-auto">
+                                <span id="labelFiltroHasta" class="small text-white-50 d-none">Hasta:</span>
+                                <input type="date" id="filtroFechaFin"
+                                    class="form-control form-control-sm d-none w-auto">
+                            </div>
+                            <input type="month" id="filtroMes" class="form-control form-control-sm d-none w-auto">
+                            <button class="btn btn-sm btn-primary" id="btnAplicarFiltro">Filtrar</button>
+                            <button class="btn btn-sm btn-danger d-flex align-items-center gap-1" id="btnExportarPDF">
+                                <span>📥</span> PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Concepto</th>
+                                    <th>Ruta</th>
+                                    <th>Monto</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaGastosEmpleadoDetalle">
+                                <!-- Se carga dinámicamente -->
+                            </tbody>
+                            <tfoot class="table-light fw-bold">
+                                <tr>
+                                    <td colspan="3" class="text-end">TOTAL:</td>
+                                    <td id="totalGastosDetalle" class="text-primary">$0</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

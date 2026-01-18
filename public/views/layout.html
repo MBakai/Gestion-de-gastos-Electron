@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Sistema Contable</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; style-src 'self' 'unsafe-inline';">
+  <link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3 d-none" id="mainNavbar">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#" data-view="index.html">📊 Sistema Contable</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-nav ms-auto text-end align-items-end gap-2">
+          <a class="nav-link" href="#" data-view="usuario/registroUsuarios.html">👤 Nuevo Empleado</a>
+          <a class="nav-link" href="#" data-view="usuario/registrarGastos.html">💰 Registrar Gastos</a>
+          <a class="nav-link text-warning fw-bold" href="#" id="lnkMantenimiento">🛠️ Mantenimiento</a>
+          <button class="btn btn-outline-danger btn-sm ms-lg-2" id="btnLogout">🚪 Salir</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mt-4" id="content">
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Contenedor para Modales y Componentes Cargados Dinámicamente -->
+  <div id="modal-container"></div>
+
+  <script src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../../node_modules/jspdf/dist/jspdf.umd.min.js"></script>
+  <script src="../../node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.min.js"></script>
+  <script type="module" src="../../dist/render/renderer.js"></script>
+</body>
+
+</html>

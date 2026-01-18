@@ -1,0 +1,103 @@
+<div id="loginView" class="container h-100 d-flex align-items-center justify-content-center py-5">
+    <div class="card shadow-lg border-0" style="width: 100%; max-width: 450px;">
+        <div class="card-header bg-dark text-white text-center py-4">
+            <h3 class="mb-0 fw-bold">🛡️ Acceso Seguro</h3>
+            <p id="authSubtitle" class="small text-white-50 mt-2 mb-0">Identifícate para continuar</p>
+        </div>
+        <div class="card-body p-4">
+            <!-- Formulario de LOGIN -->
+            <div id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Usuario</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light">👤</span>
+                        <input type="text" id="loginNick" class="form-control" placeholder="Nombre de usuario">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Contraseña</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light">🔑</span>
+                        <input type="password" id="loginPass" class="form-control" placeholder="••••••••">
+                    </div>
+                </div>
+                <div class="text-end mb-4">
+                    <button id="lnkRecuperar" class="btn btn-link btn-sm text-decoration-none p-0 text-muted">¿Olvidaste
+                        tu contraseña?</button>
+                </div>
+                <button id="btnEntrar" class="btn btn-primary w-100 py-3 fw-bold shadow-sm mb-3">
+                    🚀 Iniciar Sesión
+                </button>
+            </div>
+
+            <!-- Formulario de REGISTRO INICIAL -->
+            <div id="registerForm" class="d-none">
+                <div class="alert alert-primary py-2 small mb-3 border-0">
+                    ✨ <strong>Configuración Maestra</strong>: Esta será tu única cuenta de acceso.
+                </div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">Nickname</label>
+                        <input type="text" id="regNick" class="form-control" placeholder="Ej: admin">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">Password</label>
+                        <input type="password" id="regPass" class="form-control" placeholder="Mínimo 4 caracteres">
+                    </div>
+                    <hr class="my-3">
+                    <div class="col-12">
+                        <label class="form-label small fw-bold text-primary">Pregunta de Seguridad
+                            (Recuperación)</label>
+                        <select id="regPregunta" class="form-select mb-2">
+                            <option value="">Selecciona una pregunta...</option>
+                            <option value="¿Cuál es el nombre de tu primera mascota?">¿Cuál es el nombre de tu primera
+                                mascota?</option>
+                            <option value="¿En qué ciudad naciste?">¿En qué ciudad naciste?</option>
+                            <option value="¿Cuál es tu color favorito?">¿Cuál es tu color favorito?</option>
+                            <option value="¿Nombre de tu escuela primaria?">¿Nombre de tu escuela primaria?</option>
+                        </select>
+                        <input type="text" id="regRespuesta" class="form-control" placeholder="Tu respuesta secreta">
+                    </div>
+                </div>
+                <button id="btnRegistrarAdmin" class="btn btn-success w-100 py-3 fw-bold shadow-sm mt-4">
+                    🛠️ Crear Cuenta y Acceder
+                </button>
+            </div>
+
+            <!-- Formulario de RECUPERACIÓN -->
+            <div id="recoveryForm" class="d-none">
+                <div class="mb-4">
+                    <button id="btnBackToLogin" class="btn btn-link btn-sm text-decoration-none p-0">← Volver al
+                        login</button>
+                </div>
+                <h5 class="fw-bold mb-3">Recuperar Acceso</h5>
+                <p id="txtPregunta" class="small text-muted mb-3 font-italic"></p>
+
+                <!-- Paso 1: Responder pregunta -->
+                <div id="step1Recovery">
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">Tu Respuesta</label>
+                        <input type="text" id="recoveryAnswer" class="form-control" placeholder="Escribe tu respuesta">
+                    </div>
+                    <button id="btnVerificarRespuesta" class="btn btn-info text-white w-100 py-2 fw-bold shadow-sm">
+                        Verificar Identidad
+                    </button>
+                </div>
+
+                <!-- Paso 2: Nueva contraseña -->
+                <div id="step2Recovery" class="d-none">
+                    <div class="alert alert-success py-2 small mb-3">
+                        ✅ Identidad verificada. Ingresa tu nueva contraseña.
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">Nueva Contraseña</label>
+                        <input type="password" id="newPass" class="form-control" placeholder="Mínimo 4 caracteres">
+                    </div>
+                    <button id="btnResetPass" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                        Actualizar y Entrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
