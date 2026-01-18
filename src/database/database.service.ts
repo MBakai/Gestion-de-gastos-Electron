@@ -9,8 +9,7 @@ export class DatabaseService {
 
   private constructor() {
     const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, 'sistema-contable.db');
-    console.log('Ruta de la base de datos:', dbPath);
+    const dbPath = path.join(userDataPath, 'recredi.db');
 
     this.db = new Database(dbPath);
     this.inicializarTablas();
@@ -81,7 +80,6 @@ export class DatabaseService {
 
     if (!columnasEmpleados.includes('apellido')) {
       this.db.exec('ALTER TABLE empleados ADD COLUMN apellido TEXT');
-      console.log('✅ Columna "apellido" agregada a empleados');
     }
     if (!columnasEmpleados.includes('address')) {
       this.db.exec('ALTER TABLE empleados ADD COLUMN address TEXT');
@@ -102,7 +100,6 @@ export class DatabaseService {
 
     if (!columnasGastos.includes('ruta')) {
       this.db.exec('ALTER TABLE gastos ADD COLUMN ruta TEXT');
-      console.log('✅ Columna "ruta" agregada a gastos');
     }
 
     // Verificar usuarios

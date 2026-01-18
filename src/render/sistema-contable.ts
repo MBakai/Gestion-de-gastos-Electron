@@ -27,23 +27,18 @@ export class SistemaContable {
 
     if (btnAdd) {
       btnAdd.addEventListener("click", () => this.empleadosCtrl.agregarEmpleado());
-      console.log("🔗 Evento btnAgregarEmpleado conectado");
     }
     if (btnReg) {
       btnReg.addEventListener("click", () => this.gastosCtrl.registrarGasto());
-      console.log("🔗 Evento btnRegistrarGasto conectado");
     }
     if (btnCalc) {
       btnCalc.addEventListener("click", () => this.gastosCtrl.calcularResumen());
-      console.log("🔗 Evento btnCalcularSemanal conectado");
     }
     if (btnBatch) {
       btnBatch.addEventListener("click", () => this.gastosCtrl.procesarGastosLote());
-      console.log("🔗 Evento btnProcesarLote conectado");
     }
     if (btnSaveEmp) {
       btnSaveEmp.addEventListener("click", () => this.empleadosCtrl.guardarCambios());
-      console.log("🔗 Evento btnGuardarEmpleado conectado");
     }
   }
 }

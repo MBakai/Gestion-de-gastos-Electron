@@ -33,18 +33,11 @@ async function loadComponents() {
         }
       }
     }
-    console.log("🧩 Componentes cargados correctamente");
   } catch (err) {
-    console.error("❌ Error cargando componentes:", err);
   }
 }
 
 async function loadView(view: string, id?: number) {
-  if (id !== undefined) {
-    (window as any).appState.currentEmpleadoId = id;
-  }
-
-  console.log(`📡 Intentando cargar vista: ${view}`);
   try {
     const res = await fetch(view);
     if (!res.ok && res.status !== 0) throw new Error(`HTTP error! status: ${res.status}`);
@@ -61,10 +54,7 @@ async function loadView(view: string, id?: number) {
     } else if (html.includes('data-controller="SistemaContable"')) {
       new SistemaContable();
     }
-
-    console.log(`✅ Vista cargada con éxito: ${view}`);
   } catch (err) {
-    console.error(`❌ Error fatal cargando vista "${view}":`, err);
     const content = document.getElementById("content");
     if (content) {
       content.innerHTML = `<div class="alert alert-danger">Error cargando vista: ${err}</div>`;
@@ -74,7 +64,6 @@ async function loadView(view: string, id?: number) {
 
 // Cargar vista inicial
 window.addEventListener('DOMContentLoaded', async () => {
-  console.log("🏁 DOM cargado, verificando sesión...");
   await loadComponents();
 
   const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
@@ -106,7 +95,6 @@ function setupLogout() {
     };
 
     btnConfirmar.onclick = () => {
-      console.log("👋 Cerrando sesión...");
       sessionStorage.removeItem("isLoggedIn");
       modal.hide();
       window.location.reload();

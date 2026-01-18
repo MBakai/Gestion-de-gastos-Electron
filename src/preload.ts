@@ -4,7 +4,6 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { Empleado } from './interfaces/empleado';
 import { Gasto } from './interfaces/gasto';
 
-console.log('🔌 Preload script cargado');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // Empleados

@@ -26,9 +26,8 @@ export class MaintenanceService {
                 success: true,
                 message: `Mantenimiento exitoso. Se creó respaldo en: ${path.basename(backupPath)}. Se eliminaron ${deletedCount} registros antiguos y se optimizó el almacenamiento.`
             };
-        } catch (error: any) {
-            console.error('❌ Error en mantenimiento:', error);
-            return { success: false, message: `Error en mantenimiento: ${error.message}` };
+        } catch (error) {
+            return { success: false, message: 'Falla crítica durante el proceso de mantenimiento.' };
         }
     }
 
@@ -47,19 +46,16 @@ export class MaintenanceService {
 
         // better-sqlite3 backup es asíncrono y más seguro que copiar el archivo
         await this.db.backup(backupPath);
-        console.log(`✅ Respaldo creado en: ${backupPath}`);
         return backupPath;
     }
 
     private cleanupOldExpenses(): number {
         const stmt = this.db.prepare("DELETE FROM gastos WHERE fecha < date('now', '-1 year')");
         const result = stmt.run();
-        console.log(`🗑️ Se eliminaron ${result.changes} gastos con más de un año de antigüedad.`);
         return result.changes;
     }
 
     private optimizeDatabase(): void {
         this.db.exec('VACUUM');
-        console.log('⚡ Base de datos optimizada (VACUUM ejecutado).');
     }
 }

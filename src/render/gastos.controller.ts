@@ -12,7 +12,6 @@ export class GastosController {
 
   constructor(empleadosRef: Empleado[]) {
     this.empleados = empleadosRef;
-    console.log("💰 Controlador de Gastos inicializado");
     this.inicializarEscuchaDetalle();
   }
 
@@ -142,7 +141,6 @@ export class GastosController {
         );
       }
     } catch (error) {
-      console.error("❌ Error batch:", error);
     }
   }
 
@@ -378,7 +376,6 @@ export class GastosController {
         this.renderGastosDetalle(filtro);
       }
     } catch (error) {
-      console.error("❌ Error al actualizar gasto:", error);
       this.mostrarAlerta("Error", "No se pudo guardar el cambio del gasto.");
     }
   }

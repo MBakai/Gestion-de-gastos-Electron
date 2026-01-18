@@ -48,12 +48,6 @@ app.whenReady().then(() => {
   maintenanceService = new MaintenanceService();
   createWindow();
   setupIpcHandlers();
-  // TEMPORAL: Ver dónde se guarda la base de datos
-  const userDataPath = app.getPath('userData');
-  console.log('===================================');
-  console.log('📁 Carpeta de datos:', userDataPath);
-  console.log('📊 Base de datos en:', path.join(userDataPath, 'sistema-contable.db'));
-  console.log('===================================');
 });
 
 app.on('window-all-closed', () => {

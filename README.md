@@ -1,4 +1,4 @@
-# Sistema Contable - Gestión de Gastos
+# Recredi App - Gestión de Gastos
 
 Aplicación de escritorio construida con **Electron**, **TypeScript** y **SQLite** para el registro y gestión de gastos de empleados.
 

@@ -1,7 +1,8 @@
 {
-  "name": "sistema-contable",
+  "name": "recredi-app",
+  "productName": "Recredi App",
   "version": "1.0.0",
-  "description": "Sistema contable para empleados",
+  "description": "Sistema de gestion de gastos",
   "main": "dist/main.js",
   "scripts": {
     "build:main": "tsc -p tsconfig.json",

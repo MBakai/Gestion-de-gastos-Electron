@@ -50,7 +50,6 @@ export class MaintenanceController {
                 this.showStatus(result.message, 'alert-danger');
             }
         } catch (error: any) {
-            console.error('❌ Error mantenimiento UI:', error);
             this.showStatus('Error de comunicación con el sistema.', 'alert-danger');
         } finally {
             btnEjecutar.disabled = false;

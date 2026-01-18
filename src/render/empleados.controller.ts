@@ -9,7 +9,6 @@ export class EmpleadosController {
   private empleados: Empleado[] = [];
 
   constructor() {
-    console.log("👥 Controlador de Empleados inicializado");
     this.inicializarEscuchaDetalle();
     this.inicializarEscuchaBusqueda();
   }
@@ -40,7 +39,6 @@ export class EmpleadosController {
       this.renderSelectEmpleados();
 
     } catch (error) {
-      console.error("❌ Error al cargar empleados:", error);
     }
   }
 
@@ -74,7 +72,6 @@ export class EmpleadosController {
 
     try {
       const nuevoEmpleado = await window.electronAPI.agregarEmpleado({ DNI, nombre, apellido, tel, address, edad });
-      console.log("✅ Empleado agregado:", nuevoEmpleado);
       this.empleados.push(nuevoEmpleado);
 
       this.mostrarAlerta("Éxito", `Empleado <strong>${nombre} ${apellido}</strong> agregado correctamente.`);
@@ -91,7 +88,6 @@ export class EmpleadosController {
       }
 
     } catch (error) {
-      console.error("❌ Error al agregar empleado:", error);
       this.mostrarAlerta("Error", "No se pudo agregar el empleado: " + error);
     }
   }
@@ -112,7 +108,6 @@ export class EmpleadosController {
         if (labelNombre) labelNombre.textContent = `${emp.nombre} ${emp.apellido}`;
       }
     } catch (error) {
-      console.error("❌ Error al cargar detalle:", error);
     }
   }
 
@@ -178,7 +173,6 @@ export class EmpleadosController {
         await this.cargar(); // Refrescar lista interna
       }
     } catch (error) {
-      console.error("❌ Error al actualizar empleado:", error);
       this.mostrarAlerta("Error", "Ocurrió un error al intentar guardar los cambios.");
     }
   }
