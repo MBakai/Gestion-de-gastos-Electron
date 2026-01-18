@@ -1,7 +1,8 @@
 // src/main.ts
 
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import * as path from 'path';
+import { autoUpdater } from 'electron-updater';
 import { Empleado } from './interfaces/empleado';
 import { Gasto } from './interfaces/gasto';
 import { DatabaseService } from './database/database.service';
@@ -48,7 +49,38 @@ app.whenReady().then(() => {
   maintenanceService = new MaintenanceService();
   createWindow();
   setupIpcHandlers();
+  setupAutoUpdater();
 });
+
+function setupAutoUpdater(): void {
+  // Configuración básica
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.on('update-available', () => {
+    // Podríamos notificar al renderer aquí vía IPC if needed
+  });
+
+  autoUpdater.on('update-downloaded', async (info) => {
+    const result = await dialog.showMessageBox({
+      type: 'info',
+      title: 'Actualización lista',
+      message: `Una nueva versión (${info.version}) ha sido descargada. ¿Deseas reiniciar para aplicar los cambios?`,
+      buttons: ['Actualizar ahora', 'Más tarde']
+    });
+
+    if (result.response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+
+  // Solo check en producción para evitar ruidos en dev
+  if (app.isPackaged) {
+    autoUpdater.checkForUpdatesAndNotify().catch(err => {
+      // Sileciosamente fallar si no hay internet o repo inaccesible
+    });
+  }
+}
 
 app.on('window-all-closed', () => {
   // Cerrar la base de datos

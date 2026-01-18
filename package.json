@@ -11,7 +11,41 @@
     "start": "npm run build && electron .",
     "dev": "npm run build:main && npm run build:renderer && electron . --inspect",
     "copy:views": "copyfiles -u 1 public/**/* dist/",
+    "dist": "npm run build && electron-builder",
+    "publish": "npm run build && electron-builder --publish always",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.recredi.app",
+    "productName": "Recredi App",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "public/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "public/favicon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Recredi App"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "MBakai",
+        "repo": "Gestion-de-gastos-Electron"
+      }
+    ]
   },
   "keywords": [],
   "author": "",
@@ -23,6 +57,7 @@
     "@types/node": "^24.7.2",
     "copyfiles": "^2.4.1",
     "electron": "^38.2.2",
+    "electron-builder": "^26.4.0",
     "electron-rebuild": "^3.2.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
@@ -30,6 +65,7 @@
   "dependencies": {
     "better-sqlite3": "^12.4.1",
     "bootstrap": "^5.3.8",
+    "electron-updater": "^6.7.3",
     "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.7"
   }
