@@ -7,4 +7,5 @@ export interface Empleado {
   tel: number;
   edad: number;
   fechaRegistro: string;
+  fechaDeshabilitacion?: string;
 }

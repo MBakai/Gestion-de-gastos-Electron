@@ -17,7 +17,8 @@ async function loadComponents() {
     "components/alertModal.html",
     "components/editGastoModal.html",
     "components/confirmLogout.html",
-    "components/maintenanceModal.html"
+    "components/maintenanceModal.html",
+    "components/inactiveEmployeesModal.html"
   ];
 
   try {

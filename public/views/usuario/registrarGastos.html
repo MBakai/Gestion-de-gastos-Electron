@@ -11,11 +11,17 @@
                     <h5 class="mb-0 fw-bold">📝 Registro Individual</h5>
                 </div>
                 <div class="card-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small">Empleado</label>
-                        <select id="selectEmpleado" class="form-select border-2">
-                            <option value="">Seleccionar empleado...</option>
-                        </select>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small">DNI</label>
+                            <input type="text" id="gastoEmpleadoDNI" class="form-control border-2 bg-light" readonly>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold small">Empleado</label>
+                            <input type="text" id="gastoEmpleadoNombre" class="form-control border-2 bg-light" readonly>
+                        </div>
+                        <!-- Hidden ID for logic -->
+                        <input type="hidden" id="gastoEmpleadoId">
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6 mb-3">

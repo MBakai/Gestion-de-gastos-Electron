@@ -16,6 +16,8 @@ interface IElectronAPI {
     obtenerEmpleadoPorId: (id: number) => Promise<any | null>;
     eliminarEmpleado: (id: number) => Promise<boolean>;
     verificarDNI: (DNI: number, idExcluir?: number) => Promise<boolean>;
+    obtenerEmpleadosInactivos: () => Promise<any[]>;
+    reactivarEmpleado: (id: number) => Promise<boolean>;
     agregarGasto: (
         empleadoId: number,
         monto: number,

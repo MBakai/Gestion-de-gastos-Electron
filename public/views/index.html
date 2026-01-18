@@ -4,6 +4,7 @@
         <div class="d-flex gap-2 flex-grow-1 flex-md-grow-0">
             <input type="text" id="buscarEmpleado" class="form-control" placeholder="🔍 Buscar por DNI o Nombre..."
                 style="max-width: 300px;">
+            <button class="btn btn-outline-secondary me-2" id="btnVerInactivos">♻️ Papelera</button>
             <button class="btn btn-success" data-view="usuario/registroUsuarios.html">Añadir Empleado</button>
         </div>
     </div>
@@ -18,6 +19,7 @@
                             <th>Nombre Completo</th>
                             <th>Teléfono</th>
                             <th>Dirección</th>
+                            <th>Fecha de registro</th>
                             <th class="text-end px-4">Acciones</th>
                         </tr>
                     </thead>
@@ -30,4 +32,23 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Paginación -->
+<div class="d-flex justify-content-between align-items-center mt-3" id="paginationControls">
+    <span class="text-muted small" id="paginationInfo">Mostrando 0 - 0 de 0 empleados</span>
+    <nav aria-label="Navegación de empleados">
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item disabled" id="btnPagePrev">
+                <button class="page-link" tabindex="-1">Anterior</button>
+            </li>
+            <li class="page-item active" aria-current="page">
+                <span class="page-link" id="labelCurrentPage">1</span>
+            </li>
+            <li class="page-item disabled" id="btnPageNext">
+                <button class="page-link">Siguiente</button>
+            </li>
+        </ul>
+    </nav>
+</div>
 </div>

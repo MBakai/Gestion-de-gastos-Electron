@@ -29,6 +29,11 @@ function createWindow(): void {
     }
   });
 
+  // Ocultar la barra de menú predeterminada
+  // if (mainWindow) {
+  //   mainWindow.setMenu(null);
+  // }
+
   mainWindow.loadFile(path.join(__dirname, '../public/views/layout.html'));
 
   if (process.env.NODE_ENV === 'development') {
@@ -142,6 +147,14 @@ function setupIpcHandlers(): void {
 
   ipcMain.handle('actualizar-empleado', (_event, id: number, emp: any) => {
     return empleadoService.actualizarEmpleado(id, emp.nombre, emp.apellido, emp.address, emp.tel, emp.edad, emp.DNI);
+  });
+
+  ipcMain.handle('obtener-empleados-inactivos', (): Empleado[] => {
+    return empleadoService.obtenerEmpleadosInactivos();
+  });
+
+  ipcMain.handle('reactivar-empleado', (_event, id: number): boolean => {
+    return empleadoService.reactivarEmpleado(id);
   });
 
   ipcMain.handle('eliminar-gasto', (_event, id: number): boolean => {

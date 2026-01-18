@@ -38,6 +38,7 @@ export class DatabaseService {
         tel INTEGER,
         edad INTEGER,
         fechaRegistro TEXT NOT NULL,
+        fechaDeshabilitacion TEXT,
         activo INTEGER DEFAULT 1
       )
     `);
@@ -92,6 +93,9 @@ export class DatabaseService {
     }
     if (!columnasEmpleados.includes('DNI')) {
       this.db.exec('ALTER TABLE empleados ADD COLUMN DNI INTEGER');
+    }
+    if (!columnasEmpleados.includes('fechaDeshabilitacion')) {
+      this.db.exec('ALTER TABLE empleados ADD COLUMN fechaDeshabilitacion TEXT');
     }
 
     // Verificar y agregar columnas faltantes en gastos

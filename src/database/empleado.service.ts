@@ -52,18 +52,32 @@ export class EmpleadoService {
   }
 
   eliminarEmpleado(id: number): boolean {
-    const stmt = this.db.prepare(`UPDATE empleados SET activo = 0 WHERE id = ?`);
+    const fecha = new Date().toISOString();
+    const stmt = this.db.prepare(`UPDATE empleados SET activo = 0, fechaDeshabilitacion = ? WHERE id = ?`);
+    const result = stmt.run(fecha, id);
+    return result.changes > 0;
+  }
+
+  obtenerEmpleadosInactivos(): Empleado[] {
+    const stmt = this.db.prepare(`
+      SELECT * FROM empleados WHERE activo = 0 ORDER BY nombre ASC
+    `);
+    return stmt.all() as Empleado[];
+  }
+
+  reactivarEmpleado(id: number): boolean {
+    const stmt = this.db.prepare(`UPDATE empleados SET activo = 1, fechaDeshabilitacion = NULL WHERE id = ?`);
     const result = stmt.run(id);
     return result.changes > 0;
   }
 
   verificarDNI(DNI: number, idExcluir: number | null = null): boolean {
     if (idExcluir) {
-      const stmt = this.db.prepare(`SELECT count(*) as count FROM empleados WHERE DNI = ? AND id != ? AND activo = 1`);
+      const stmt = this.db.prepare(`SELECT count(*) as count FROM empleados WHERE DNI = ? AND id != ?`);
       const res = stmt.get(DNI, idExcluir) as { count: number };
       return res.count > 0;
     } else {
-      const stmt = this.db.prepare(`SELECT count(*) as count FROM empleados WHERE DNI = ? AND activo = 1`);
+      const stmt = this.db.prepare(`SELECT count(*) as count FROM empleados WHERE DNI = ?`);
       const res = stmt.get(DNI) as { count: number };
       return res.count > 0;
     }

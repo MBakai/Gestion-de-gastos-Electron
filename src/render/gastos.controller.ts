@@ -17,10 +17,34 @@ export class GastosController {
     this.inicializarVistaRegistro();
   }
 
-  private inicializarVistaRegistro(): void {
-    // Configurar input de fecha en vista de registro de gastos
+  private async inicializarVistaRegistro(): Promise<void> {
+    // Configurar input de fecha
     if (document.getElementById("fechaGasto")) {
       configurarInputFecha("fechaGasto");
+
+      // Logica de llenado contextual
+      const currentId = (window as any).appState.currentEmpleadoId;
+      if (!currentId) {
+        this.mostrarAlerta("Acceso Inválido", "Debes seleccionar un empleado desde el listado para registrar gastos.");
+        // Redirigir al listado despues de cerrar alerta o inmediatamente
+        setTimeout(() => {
+          const event = new CustomEvent("navegar", { detail: { vista: "index.html" } });
+          document.dispatchEvent(event);
+        }, 2000);
+        return;
+      }
+
+      // Buscar empleado (asegurar tener datos frescos)
+      if (this.empleados.length === 0) {
+        this.empleados = await window.electronAPI.obtenerEmpleados();
+      }
+
+      const emp = this.empleados.find(e => e.id === Number(currentId));
+      if (emp) {
+        (document.getElementById("gastoEmpleadoDNI") as HTMLInputElement).value = emp.DNI ? emp.DNI.toString() : "---";
+        (document.getElementById("gastoEmpleadoNombre") as HTMLInputElement).value = `${emp.nombre} ${emp.apellido}`;
+        (document.getElementById("gastoEmpleadoId") as HTMLInputElement).value = emp.id.toString();
+      }
     }
   }
 
@@ -40,21 +64,22 @@ export class GastosController {
   }
 
   async registrarGasto(): Promise<void> {
-    const idInput = document.getElementById("selectEmpleado") as HTMLSelectElement | null;
+    const idInput = document.getElementById("gastoEmpleadoId") as HTMLInputElement | null;
     const montoInput = document.getElementById("montoGasto") as HTMLInputElement | null;
     const descInput = document.getElementById("descripcionGasto") as HTMLInputElement | null;
     const fechaInput = document.getElementById("fechaGasto") as HTMLInputElement | null;
     const rutaInput = document.getElementById("rutaGasto") as HTMLInputElement | null;
 
-    // Si estamos en la vista de detalle, el ID viene del appState
-    const empleadoId = idInput ? parseInt(idInput.value) : (window as any).appState.currentEmpleadoId;
+    // Si estamos en la vista de detalle, el ID viene del appState, si estamos en registro, del hidden input
+    const empleadoId = idInput?.value ? parseInt(idInput.value) : (window as any).appState.currentEmpleadoId;
+
     const monto = parseFloat(montoInput?.value || "0") || 0;
     let descripcion = descInput?.value.trim() || "Sin descripción";
     const fecha = fechaInput?.value || obtenerFechaHoy();
     let ruta = rutaInput?.value.trim() || "";
 
     if (!empleadoId || !ruta) {
-      this.mostrarAlerta("Campos Requeridos", "Por favor selecciona el empleado y especifica la <strong>Ruta</strong>.");
+      this.mostrarAlerta("Campos Requeridos", "Error identificando al empleado o falta la <strong>Ruta</strong>.");
       return;
     }
 
@@ -96,13 +121,13 @@ export class GastosController {
   }
 
   async procesarGastosLote(): Promise<void> {
-    const selectEmpleado = document.getElementById("selectEmpleado") as HTMLSelectElement | null;
+    const idInput = document.getElementById("gastoEmpleadoId") as HTMLInputElement | null;
     const textarea = document.getElementById("inputGastosLote") as HTMLTextAreaElement | null;
     const inputFecha = document.getElementById("fechaGasto") as HTMLInputElement | null;
 
-    if (!selectEmpleado || !textarea || !inputFecha) return;
+    if (!idInput || !textarea || !inputFecha) return;
 
-    const empleadoId = parseInt(selectEmpleado.value);
+    const empleadoId = parseInt(idInput.value);
     const texto = textarea.value.trim();
     const fecha = inputFecha.value || obtenerFechaHoy();
 
@@ -111,7 +136,7 @@ export class GastosController {
     const rutaGlobal = inputRuta?.value.trim() || "";
 
     if (!empleadoId || !texto || !rutaGlobal) {
-      this.mostrarAlerta("Información Faltante", "Por favor selecciona un empleado, ingresa la <strong>Ruta</strong> global y pega la lista de gastos.");
+      this.mostrarAlerta("Información Faltante", "Por favor ingresa la <strong>Ruta</strong> global y pega la lista de gastos.");
       return;
     }
 

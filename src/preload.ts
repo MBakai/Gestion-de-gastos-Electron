@@ -25,6 +25,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   verificarDNI: (DNI: number, idExcluir?: number): Promise<boolean> =>
     ipcRenderer.invoke('verificar-dni', DNI, idExcluir),
 
+  obtenerEmpleadosInactivos: (): Promise<Empleado[]> =>
+    ipcRenderer.invoke('obtener-empleados-inactivos'),
+
+  reactivarEmpleado: (id: number): Promise<boolean> =>
+    ipcRenderer.invoke('reactivar-empleado', id),
+
   // Gastos
   agregarGasto: (empleadoId: number, monto: number, descripcion: string, fecha: string, ruta?: string): Promise<Gasto | null> =>
     ipcRenderer.invoke('agregar-gasto', empleadoId, monto, descripcion, fecha, ruta),

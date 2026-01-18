@@ -17,14 +17,17 @@ export class MaintenanceService {
             const backupPath = await this.backupDatabase();
 
             // 2. Limpiar gastos antiguos (> 1 año)
-            const deletedCount = this.cleanupOldExpenses();
+            const deletedExpenses = this.cleanupOldExpenses();
 
-            // 3. Optimizar (VACUUM)
+            // 3. Limpiar empleados inactivos antiguos (> 1 año)
+            const deletedEmployees = this.cleanupInactiveEmployees();
+
+            // 4. Optimizar (VACUUM)
             this.optimizeDatabase();
 
             return {
                 success: true,
-                message: `Mantenimiento exitoso. Se creó respaldo en: ${path.basename(backupPath)}. Se eliminaron ${deletedCount} registros antiguos y se optimizó el almacenamiento.`
+                message: `Mantenimiento exitoso. Se creó respaldo en: ${path.basename(backupPath)}. \nSe eliminaron ${deletedExpenses} gastos antiguos y ${deletedEmployees} empleados inactivos.`
             };
         } catch (error) {
             return { success: false, message: 'Falla crítica durante el proceso de mantenimiento.' };
@@ -51,6 +54,14 @@ export class MaintenanceService {
 
     private cleanupOldExpenses(): number {
         const stmt = this.db.prepare("DELETE FROM gastos WHERE fecha < date('now', '-1 year')");
+        const result = stmt.run();
+        return result.changes;
+    }
+
+    private cleanupInactiveEmployees(): number {
+        // Elimina empleados que están inactivos y su fecha de deshabilitación es mayor a 1 año.
+        // Asumiendo que 'gastos' tiene ON DELETE CASCADE, esto también eliminará sus gastos asociados.
+        const stmt = this.db.prepare("DELETE FROM empleados WHERE activo = 0 AND fechaDeshabilitacion < date('now', '-1 year')");
         const result = stmt.run();
         return result.changes;
     }

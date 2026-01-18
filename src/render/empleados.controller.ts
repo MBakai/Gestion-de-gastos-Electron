@@ -1,6 +1,6 @@
 /// <reference path="../interfaces/electron.d.ts" />
 import { Empleado } from "../interfaces/empleado.js";
-import { toTitleCase, validarDNI, validarTelefono, validarEdad, ModalHelper } from "./utils.js";
+import { validarDNI, validarTelefono, validarEdad, toTitleCase, ModalHelper } from "./utils.js";
 
 declare var bootstrap: any;
 
@@ -223,6 +223,11 @@ export class EmpleadosController {
     }
   }
 
+  // Estado de paginación
+  private currentPage: number = 1;
+  private itemsPerPage: number = 8;
+  private filteredEmpleados: Empleado[] = [];
+
   private renderSelectEmpleados(filtro?: string): void {
     // 1. Renderizar el select (si existe en la vista actual)
     const select = document.getElementById("selectEmpleado") as HTMLSelectElement | null;
@@ -236,60 +241,348 @@ export class EmpleadosController {
       });
     }
 
-    // 2. Renderizar la tabla de inicio (si existe)
+    // 2. Filtrar lista para la tabla
+    const termino = filtro?.toLowerCase().trim() || "";
+    this.filteredEmpleados = termino
+      ? this.empleados.filter(e =>
+        e.nombre.toLowerCase().includes(termino) ||
+        e.apellido.toLowerCase().includes(termino) ||
+        e.DNI?.toString().includes(termino)
+      )
+      : [...this.empleados];
+
+    // Reiniciar a página 1 si se busca algo nuevo
+    if (filtro !== undefined) {
+      this.currentPage = 1;
+    }
+
+    this.renderTablaPaginada();
+    this.setupPaginationControls();
+  }
+
+  private renderTablaPaginada(): void {
     const tabla = document.getElementById("listaEmpleadosTabla") as HTMLTableSectionElement | null;
-    if (tabla) {
-      const termino = filtro?.toLowerCase().trim() || "";
-      const listaMostrable = termino
-        ? this.empleados.filter(e =>
-          e.nombre.toLowerCase().includes(termino) ||
-          e.apellido.toLowerCase().includes(termino) ||
-          e.DNI?.toString().includes(termino)
-        )
-        : this.empleados;
+    if (!tabla) return;
 
-      if (listaMostrable.length === 0) {
-        tabla.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">${termino ? 'No se encontraron resultados' : 'No hay empleados registrados'}</td></tr>`;
-        return;
+    // Calcular indices
+    const totalItems = this.filteredEmpleados.length;
+    const totalPages = Math.ceil(totalItems / this.itemsPerPage) || 1;
+
+    // Asegurar página válida
+    if (this.currentPage > totalPages) this.currentPage = totalPages;
+    if (this.currentPage < 1) this.currentPage = 1;
+
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = Math.min(startIndex + this.itemsPerPage, totalItems);
+
+    const empleadosPagina = this.filteredEmpleados.slice(startIndex, endIndex);
+
+    // Actualizar Info Paginación
+    const infoLabel = document.getElementById("paginationInfo");
+    if (infoLabel) {
+      infoLabel.textContent = totalItems > 0
+        ? `Mostrando ${startIndex + 1} - ${endIndex} de ${totalItems} empleados`
+        : `Mostrando 0 - 0 de 0 empleados`;
+    }
+
+    const pageLabel = document.getElementById("labelCurrentPage");
+    if (pageLabel) pageLabel.textContent = this.currentPage.toString();
+
+
+    if (empleadosPagina.length === 0) {
+      const termino = (document.getElementById("buscarEmpleado") as HTMLInputElement)?.value;
+      tabla.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">${termino ? 'No se encontraron resultados' : 'No hay empleados registrados'}</td></tr>`;
+      return;
+    }
+
+    tabla.innerHTML = "";
+    empleadosPagina.forEach((emp) => {
+      const tr = document.createElement("tr");
+      const fechaFormateada = emp.fechaRegistro
+        ? emp.fechaRegistro.split('T')[0].replace(/-/g, '/')
+        : '---';
+
+      tr.innerHTML = `
+        <td class="fw-bold">${emp.DNI || '---'}</td>
+        <td>${emp.nombre} ${emp.apellido}</td>
+        <td>${emp.tel}</td>
+        <td><small class="text-muted fw-bold">${emp.address}</small></td>
+        <td>${fechaFormateada}</td>
+        <td class="text-end px-4">
+          <button class="btn btn-sm btn-success me-1 btn-registrar-gasto-directo" data-id="${emp.id}" title="Registrar Gasto">
+            💲
+          </button>
+          <button class="btn btn-sm btn-outline-primary me-1 btn-ver-detalle" data-id="${emp.id}" title="Ver Detalle">
+            👁️
+          </button>
+          <button class="btn btn-sm btn-outline-danger btn-eliminar-empleado" data-id="${emp.id}" title="Eliminar">
+            🗑️
+          </button>
+        </td>
+      `;
+
+      // Eventos para los botones
+      tr.querySelector(".btn-registrar-gasto-directo")?.addEventListener("click", () => {
+        // Navegar a registrar GASTO con el ID del empleado
+        (window as any).appState.currentEmpleadoId = emp.id;
+        const event = new CustomEvent("navegar", {
+          detail: { vista: "usuario/registrarGastos.html", id: emp.id }
+        });
+        document.dispatchEvent(event);
+      });
+
+      tr.querySelector(".btn-ver-detalle")?.addEventListener("click", () => {
+        const event = new CustomEvent("navegar", {
+          detail: { vista: "usuario/detallesUsuarios.html", id: emp.id }
+        });
+        document.dispatchEvent(event);
+      });
+
+      tr.querySelector(".btn-eliminar-empleado")?.addEventListener("click", () => {
+        this.mostrarConfirmacion(
+          "Desactivar Empleado",
+          `¿Estás seguro de que deseas desactivar a <strong>${emp.nombre} ${emp.apellido}</strong>? 
+           El empleado quedará como inactivo y no podrás registrarle gastos.`,
+          () => this.eliminarEmpleado(emp.id)
+        );
+      });
+
+      tabla.appendChild(tr);
+    });
+  }
+
+  private setupPaginationControls(): void {
+    const btnPrev = document.getElementById("btnPagePrev");
+    const btnNext = document.getElementById("btnPageNext");
+    const totalPages = Math.ceil(this.filteredEmpleados.length / this.itemsPerPage) || 1;
+
+    // Estado botones
+    if (btnPrev) {
+      if (this.currentPage <= 1) btnPrev.classList.add("disabled");
+      else btnPrev.classList.remove("disabled");
+
+      // Limpiar listeners antiguos clonando
+      const newBtn = btnPrev.cloneNode(true);
+      btnPrev.parentNode?.replaceChild(newBtn, btnPrev);
+      newBtn.addEventListener("click", () => {
+        if (this.currentPage > 1) {
+          this.currentPage--;
+          this.renderTablaPaginada();
+          this.setupPaginationControls();
+        }
+      });
+    }
+
+    if (btnNext) {
+      if (this.currentPage >= totalPages) btnNext.classList.add("disabled");
+      else btnNext.classList.remove("disabled");
+
+      const newBtn = btnNext.cloneNode(true);
+      btnNext.parentNode?.replaceChild(newBtn, btnNext);
+      newBtn.addEventListener("click", () => {
+        if (this.currentPage < totalPages) {
+          this.currentPage++;
+          this.renderTablaPaginada();
+          this.setupPaginationControls();
+        }
+      });
+    }
+  }
+
+  // --- Lógica para Empleados Inactivos ---
+
+  // Estado Inactivos
+  private inactivos: Empleado[] = [];
+  private filteredInactivos: Empleado[] = [];
+  private currentInactivosPage: number = 1;
+  private itemsPerInactivosPage: number = 5; // Menos items par modal
+
+  async abrirModalInactivos(): Promise<void> {
+    await this.cargarInactivos();
+
+    // Configurar listener para buscar en inactivos
+    const inputBuscar = document.getElementById("buscarInactivo") as HTMLInputElement;
+    if (inputBuscar) {
+      inputBuscar.value = ""; // Limpiar
+      // Clonar para limpiar eventos previos
+      const newInput = inputBuscar.cloneNode(true);
+      inputBuscar.parentNode?.replaceChild(newInput, inputBuscar);
+      newInput.addEventListener("input", (e) => {
+        const termino = (e.target as HTMLInputElement).value;
+        this.renderInactivos(termino);
+      });
+    }
+
+    const modalEl = document.getElementById("inactiveEmployeesModal");
+    if (modalEl) {
+      // @ts-ignore
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    }
+  }
+
+  async cargarInactivos(): Promise<void> {
+    try {
+      this.inactivos = await window.electronAPI.obtenerEmpleadosInactivos();
+      this.renderInactivos();
+    } catch (error) {
+      console.error("Error cargando inactivos:", error);
+    }
+  }
+
+  private renderInactivos(filtro: string = ""): void {
+    const tbody = document.getElementById("listaEmpleadosInactivos");
+    const emptyState = document.getElementById("emptyStateInactivos");
+
+    if (!tbody || !emptyState) return;
+
+    // 1. Filtrar
+    const termino = filtro.toLowerCase().trim();
+    this.filteredInactivos = termino
+      ? this.inactivos.filter(e =>
+        e.nombre.toLowerCase().includes(termino) ||
+        e.apellido.toLowerCase().includes(termino) ||
+        e.DNI?.toString().includes(termino)
+      )
+      : [...this.inactivos];
+
+    if (filtro !== "") this.currentInactivosPage = 1;
+
+    // 2. Paginar
+    const totalItems = this.filteredInactivos.length;
+    const totalPages = Math.ceil(totalItems / this.itemsPerInactivosPage) || 1;
+
+    if (this.currentInactivosPage > totalPages) this.currentInactivosPage = totalPages;
+    if (this.currentInactivosPage < 1) this.currentInactivosPage = 1;
+
+    const startIndex = (this.currentInactivosPage - 1) * this.itemsPerInactivosPage;
+    const endIndex = Math.min(startIndex + this.itemsPerInactivosPage, totalItems);
+    const inactivosPagina = this.filteredInactivos.slice(startIndex, endIndex);
+
+    // Ajustar altura mínima del contenedor para evitar saltos (solo si hay paginación)
+    const container = document.getElementById("inactivosTableContainer");
+    if (container) {
+      // Si el total de items supera el límite por página, fijamos altura
+      if (this.filteredInactivos.length > this.itemsPerInactivosPage) {
+        container.style.minHeight = "300px"; // Altura aproximada para 5 filas + header
+      } else {
+        container.style.minHeight = "auto";
       }
+    }
 
-      tabla.innerHTML = "";
-      listaMostrable.forEach((emp) => {
-        const tr = document.createElement("tr");
+    // 3. Renderizar
+    tbody.innerHTML = "";
+
+    // Info Paginación
+    const infoLabel = document.getElementById("paginationInfoInactivos");
+    if (infoLabel) {
+      infoLabel.textContent = totalItems > 0
+        ? `${startIndex + 1} - ${endIndex} de ${totalItems}`
+        : `0 - 0 de 0`;
+    }
+    const pageLabel = document.getElementById("labelCurrentPageInactivos");
+    if (pageLabel) pageLabel.textContent = this.currentInactivosPage.toString();
+
+    // Controles
+    this.setupInactivosPaginationControls();
+
+    if (inactivosPagina.length === 0) {
+      emptyState.classList.remove("d-none");
+    } else {
+      emptyState.classList.add("d-none");
+
+      inactivosPagina.forEach(emp => {
+        const tr = document.createElement("tr"); // Create row
+        // Formatear fecha: si existe, tomar solo la parte YYYY-MM-DD y reemplazar - por /
+        const fechaFormateada = emp.fechaDeshabilitacion
+          ? emp.fechaDeshabilitacion.split('T')[0].replace(/-/g, '/')
+          : '---';
+
         tr.innerHTML = `
-          <td class="fw-bold">${emp.DNI || '---'}</td>
-          <td>${emp.nombre} ${emp.apellido}</td>
-          <td>${emp.tel}</td>
-          <td><small class="text-muted">${emp.address}</small></td>
-          <td class="text-end px-4">
-            <button class="btn btn-sm btn-outline-primary me-1 btn-ver-detalle" data-id="${emp.id}">
-              👁️ Ver
-            </button>
-            <button class="btn btn-sm btn-outline-danger btn-eliminar-empleado" data-id="${emp.id}">
-              🗑️
-            </button>
+          <td><small class="text-muted fw-bold">${emp.DNI}</small></td>
+          <td>${emp.nombre}</td>
+          <td>${emp.apellido}</td>
+          <td>${fechaFormateada}</td>
+          <td class="text-end">
+             <button class="btn btn-sm btn-success btn-restaurar" data-id="${emp.id}">
+               ♻️ Restaurar
+             </button>
           </td>
         `;
 
-        // Eventos para los botones
-        tr.querySelector(".btn-ver-detalle")?.addEventListener("click", () => {
-          const event = new CustomEvent("navegar", {
-            detail: { vista: "usuario/detallesUsuarios.html", id: emp.id }
-          });
-          document.dispatchEvent(event);
+        tr.querySelector(".btn-restaurar")?.addEventListener("click", () => {
+          this.restaurarEmpleado(emp);
         });
 
-        tr.querySelector(".btn-eliminar-empleado")?.addEventListener("click", () => {
-          this.mostrarConfirmacion(
-            "Eliminar Empleado",
-            `¿Estás seguro de que deseas eliminar a <strong>${emp.nombre} ${emp.apellido}</strong>? Esta acción no se puede deshacer.`,
-            () => this.eliminarEmpleado(emp.id)
-          );
-        });
+        tbody.appendChild(tr);
+      });
 
-        tabla.appendChild(tr);
+    }
+  }
+
+  private setupInactivosPaginationControls(): void {
+    const btnPrev = document.getElementById("btnPagePrevInactivos");
+    const btnNext = document.getElementById("btnPageNextInactivos");
+    const totalItems = this.filteredInactivos.length;
+    const totalPages = Math.ceil(totalItems / this.itemsPerInactivosPage) || 1;
+
+    if (btnPrev) {
+      if (this.currentInactivosPage <= 1) btnPrev.classList.add("disabled");
+      else btnPrev.classList.remove("disabled");
+
+      const newBtn = btnPrev.cloneNode(true);
+      btnPrev.parentNode?.replaceChild(newBtn, btnPrev);
+      newBtn.addEventListener("click", () => {
+        if (this.currentInactivosPage > 1) {
+          this.currentInactivosPage--;
+          this.renderInactivos((document.getElementById("buscarInactivo") as HTMLInputElement)?.value || "");
+        }
       });
     }
+
+    if (btnNext) {
+      if (this.currentInactivosPage >= totalPages) btnNext.classList.add("disabled");
+      else btnNext.classList.remove("disabled");
+
+      const newBtn = btnNext.cloneNode(true);
+      btnNext.parentNode?.replaceChild(newBtn, btnNext);
+      newBtn.addEventListener("click", () => {
+        if (this.currentInactivosPage < totalPages) {
+          this.currentInactivosPage++;
+          this.renderInactivos((document.getElementById("buscarInactivo") as HTMLInputElement)?.value || "");
+        }
+      });
+    }
+  }
+
+  private async restaurarEmpleado(emp: Empleado): Promise<void> {
+    // Cerrar modal de inactivos para evitar problema de superposición (z-index)
+    const modalInactivosEl = document.getElementById("inactiveEmployeesModal");
+    if (modalInactivosEl) {
+      // @ts-ignore
+      const modalInstance = bootstrap.Modal.getInstance(modalInactivosEl);
+      modalInstance?.hide();
+    }
+
+    // Esperar un momento para que termine la animación de cierre
+    setTimeout(() => {
+      this.mostrarConfirmacion(
+        "Restaurar Empleado",
+        `¿Deseas restaurar a <strong>${emp.nombre} ${emp.apellido}</strong> y recuperar su historial de gastos?`,
+        async () => {
+          try {
+            const ok = await window.electronAPI.reactivarEmpleado(emp.id);
+            if (ok) {
+              this.mostrarAlerta("Éxito", "Empleado restaurado correctamente.");
+              await this.cargar(); // Refrescar lista principal
+              // No recargamos la modal de inactivos porque ya está cerrada, el usuario deberá abrirla de nuevo si quiere.
+            }
+          } catch (error) {
+            this.mostrarAlerta("Error", "No se pudo restaurar el empleado.");
+          }
+        }
+      );
+    }, 300); // 300ms delay
   }
 
   private mostrarConfirmacion(titulo: string, mensaje: string, onConfirm: () => void): void {

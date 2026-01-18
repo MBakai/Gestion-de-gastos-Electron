@@ -44,5 +44,10 @@ export class SistemaContable {
     if (btnSaveEmp) {
       btnSaveEmp.addEventListener("click", () => this.empleadosCtrl.guardarCambios());
     }
+
+    const btnInactivos = document.getElementById("btnVerInactivos");
+    if (btnInactivos) {
+      btnInactivos.addEventListener("click", () => this.empleadosCtrl.abrirModalInactivos());
+    }
   }
 }
