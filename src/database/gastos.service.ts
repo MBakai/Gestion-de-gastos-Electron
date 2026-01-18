@@ -9,7 +9,7 @@ export class GastoService {
 
   agregarGasto(empleadoId: number, monto: number, descripcion: string, fecha: string, ruta: string = ''): Gasto | null {
     // Validar que el empleado existe
-    const empleado = this.empleadoService.obtenerEmpleados().find(e => e.id === empleadoId);
+    const empleado = this.empleadoService.obtenerEmpleadoPorId(empleadoId);
     if (!empleado) return null;
 
     const stmt = this.db.prepare(`

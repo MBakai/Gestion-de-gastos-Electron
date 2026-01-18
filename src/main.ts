@@ -111,6 +111,10 @@ function setupIpcHandlers(): void {
     return empleadoService.obtenerEmpleados();
   });
 
+  ipcMain.handle('obtener-empleado-por-id', (_event, id: number): Empleado | null => {
+    return empleadoService.obtenerEmpleadoPorId(id);
+  });
+
   ipcMain.handle('eliminar-empleado', (_event, id: number): boolean => {
     return empleadoService.eliminarEmpleado(id);
   });

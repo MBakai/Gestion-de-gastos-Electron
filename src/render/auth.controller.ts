@@ -1,3 +1,4 @@
+/// <reference path="../interfaces/electron.d.ts" />
 // src/render/auth.controller.ts
 declare var bootstrap: any;
 
@@ -31,8 +32,8 @@ export class AuthController {
             const pregunta = (document.getElementById("regPregunta") as HTMLSelectElement).value;
             const respuesta = (document.getElementById("regRespuesta") as HTMLInputElement).value.trim();
 
-            if (nick.length < 3 || pass.length < 4 || !pregunta || !respuesta) {
-                this.mostrarAlerta("Campos Requeridos", "Por favor completa todos los campos. La contraseña debe tener al menos 4 caracteres.");
+            if (nick.length < 3 || pass.length < 8 || !pregunta || !respuesta) {
+                this.mostrarAlerta("Campos Requeridos", "Por favor completa todos los campos. La contraseña debe tener al menos 8 caracteres.");
                 return;
             }
 
@@ -108,8 +109,8 @@ export class AuthController {
         const btnReset = document.getElementById("btnResetPass");
         btnReset?.addEventListener("click", async () => {
             const nuevaPass = (document.getElementById("newPass") as HTMLInputElement).value.trim();
-            if (nuevaPass.length < 4) {
-                this.mostrarAlerta("Error", "La nueva contraseña debe tener al menos 4 caracteres.");
+            if (nuevaPass.length < 8) {
+                this.mostrarAlerta("Error", "La nueva contraseña debe tener al menos 8 caracteres.");
                 return;
             }
 

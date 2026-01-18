@@ -12,9 +12,13 @@ export class SistemaContable {
   }
 
   private async inicializar(): Promise<void> {
-    await this.empleadosCtrl.cargar();
-    const currentId = (window as any).appState.currentEmpleadoId;
-    await this.gastosCtrl.cargar(currentId);
+    // Si estamos en una vista de detalle (vista individual), los controladores
+    // se encargan de cargar su propia data basada en appState.
+    // Solo necesitamos cargar todo si estamos en el Dashboard (index.html)
+    if (!document.getElementById("viewDetalleEmpleado")) {
+      await this.empleadosCtrl.cargar();
+      await this.gastosCtrl.calcularResumen();
+    }
     this.setupEventListeners();
   }
 

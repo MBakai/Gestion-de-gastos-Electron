@@ -1,5 +1,6 @@
+/// <reference path="../interfaces/electron.d.ts" />
 import { Empleado } from "../interfaces/empleado.js";
-import { toTitleCase } from "./utils.js";
+import { toTitleCase, validarDNI, validarTelefono, validarEdad, ModalHelper } from "./utils.js";
 
 declare var bootstrap: any;
 
@@ -39,6 +40,7 @@ export class EmpleadosController {
       this.renderSelectEmpleados();
 
     } catch (error) {
+      console.error("Error al cargar empleados:", error);
     }
   }
 
@@ -54,8 +56,18 @@ export class EmpleadosController {
     if (!DNI || !nombre || !apellido || !tel || !address || !edad) return;
 
     // Validaciones
-    if (edad > 100) {
-      this.mostrarAlerta("Edad No Válida", "La edad no puede ser superior a 100 años.");
+    if (!validarDNI(DNI)) {
+      this.mostrarAlerta("DNI No Válido", "El DNI debe tener entre 6 y 10 dígitos.");
+      return;
+    }
+
+    if (!validarTelefono(tel)) {
+      this.mostrarAlerta("Teléfono No Válido", "El teléfono debe tener entre 7 y 15 dígitos.");
+      return;
+    }
+
+    if (!validarEdad(edad)) {
+      this.mostrarAlerta("Edad No Válida", "La edad debe estar entre 1 y 100 años.");
       return;
     }
 
@@ -100,14 +112,18 @@ export class EmpleadosController {
       // Necesitamos una forma de obtener un solo empleado. 
       // Por ahora lo buscaremos en la lista cargada o pediremos todos.
       await this.cargar();
-      const emp = this.empleados.find(e => e.id === id);
+      const emp = this.empleados.find(e => Number(e.id) === Number(id));
 
       if (emp) {
         this.llenarFormularioEdicion(emp);
         const labelNombre = document.getElementById("nombreDetalleEmpleado");
         if (labelNombre) labelNombre.textContent = `${emp.nombre} ${emp.apellido}`;
+      } else {
+        console.warn(`No se encontró el empleado con ID: ${id}`);
+        this.mostrarAlerta("Error", "No se pudo encontrar la información del empleado.");
       }
     } catch (error) {
+      console.error("Error al cargar detalle de empleado:", error);
     }
   }
 
@@ -143,8 +159,18 @@ export class EmpleadosController {
       return;
     }
 
-    if (edad > 100) {
-      this.mostrarAlerta("Edad No Válida", "La edad no puede ser superior a 100 años.");
+    if (!validarDNI(DNI)) {
+      this.mostrarAlerta("DNI No Válido", "El DNI debe tener entre 6 y 10 dígitos.");
+      return;
+    }
+
+    if (!validarTelefono(tel)) {
+      this.mostrarAlerta("Teléfono No Válido", "El teléfono debe tener entre 7 y 15 dígitos.");
+      return;
+    }
+
+    if (!validarEdad(edad)) {
+      this.mostrarAlerta("Edad No Válida", "La edad debe estar entre 1 y 100 años.");
       return;
     }
 

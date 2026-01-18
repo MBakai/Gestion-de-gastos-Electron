@@ -13,6 +13,7 @@ interface IElectronAPI {
         edad: number;
     }) => Promise<any>;
     obtenerEmpleados: () => Promise<any[]>;
+    obtenerEmpleadoPorId: (id: number) => Promise<any | null>;
     eliminarEmpleado: (id: number) => Promise<boolean>;
     verificarDNI: (DNI: number, idExcluir?: number) => Promise<boolean>;
     agregarGasto: (
@@ -38,9 +39,30 @@ interface IElectronAPI {
     ejecutarMantenimiento: (nick: string, pass: string) => Promise<{ success: boolean; message: string }>;
 }
 
+declare global {
+    interface Window {
+        electronAPI: IElectronAPI;
+        bootstrap: {
+            Modal: {
+                new(element: HTMLElement): any;
+                getInstance(element: HTMLElement): any;
+            };
+            Collapse: {
+                getInstance(element: HTMLElement): any;
+            };
+        };
+    }
 
-interface Window {
-    electronAPI: IElectronAPI;
+    var electronAPI: IElectronAPI;
+    var bootstrap: {
+        Modal: {
+            new(element: HTMLElement): any;
+            getInstance(element: HTMLElement): any;
+        };
+        Collapse: {
+            getInstance(element: HTMLElement): any;
+        };
+    };
 }
 
-declare var electronAPI: IElectronAPI;
+export { };

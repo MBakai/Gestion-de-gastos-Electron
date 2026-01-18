@@ -33,7 +33,7 @@ export class MaintenanceService {
 
     private async backupDatabase(): Promise<string> {
         const userDataPath = app.getPath('userData');
-        const dbPath = path.join(userDataPath, 'sistema-contable.db');
+        const dbPath = path.join(userDataPath, 'recredi.db');
 
         const backupsDir = path.join(userDataPath, 'backups');
         if (!fs.existsSync(backupsDir)) {

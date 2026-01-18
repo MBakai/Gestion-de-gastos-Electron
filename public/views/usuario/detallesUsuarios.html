@@ -46,31 +46,6 @@
 
         <!-- Gastos y Acciones -->
         <div class="col-md-8">
-            <!-- Registrar Gasto Rápido -->
-            <div class="card shadow-sm mb-4 bg-light">
-                <div class="card-body">
-                    <h6 class="text-secondary border-bottom pb-2 mb-3">➕ Registrar Gasto para <span
-                            id="nombreDetalleEmpleado">...</span></h6>
-                    <div class="row g-2 row-cols-1 row-cols-md-3 row-cols-lg-4">
-                        <div class="col">
-                            <input type="number" id="montoGasto" class="form-control form-control-sm"
-                                placeholder="Monto">
-                        </div>
-                        <div class="col">
-                            <input type="text" id="descripcionGasto" class="form-control form-control-sm"
-                                placeholder="Descripción">
-                        </div>
-                        <div class="col">
-                            <input type="text" id="rutaGasto" class="form-control form-control-sm"
-                                placeholder="Ruta (Obligatorio)">
-                        </div>
-                        <div class="col-12 col-lg-auto ms-lg-auto">
-                            <button id="btnRegistrarGasto" class="btn btn-success btn-sm w-100">Añadir</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Historial de Gastos -->
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-dark text-white p-2">
@@ -78,10 +53,10 @@
                         <h5 class="mb-0 fs-6 me-2">📑 Historial de Gastos</h5>
                         <div class="d-flex flex-wrap gap-2 align-items-center">
                             <select id="filtroTipo" class="form-select form-select-sm w-auto">
+                                <option value="todo" selected>Todo el historial</option>
                                 <option value="dia">Día específico</option>
                                 <option value="rango">Rango (Desde / Hasta)</option>
                                 <option value="mes">Mes completo</option>
-                                <option value="todo">Todo el historial</option>
                             </select>
                             <div id="contenedorFiltroFechas" class="d-flex flex-wrap gap-1 align-items-center">
                                 <span id="labelFiltroDesde" class="small text-white-50 d-none">Desde:</span>

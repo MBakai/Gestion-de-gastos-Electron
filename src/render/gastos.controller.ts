@@ -1,7 +1,8 @@
+/// <reference path="../interfaces/electron.d.ts" />
 import { Gasto } from "../interfaces/gasto.js";
 import { ResumenSemanal } from "../interfaces/resumen-semanal.js";
 import { Empleado } from "../interfaces/empleado.js";
-import { toTitleCase } from "./utils.js";
+import { toTitleCase, validarMonto, ModalHelper, configurarInputFecha, obtenerFechaHoy } from "./utils.js";
 
 declare var bootstrap: any;
 declare var jspdf: any; // Para jsPDF UMD
@@ -13,12 +14,24 @@ export class GastosController {
   constructor(empleadosRef: Empleado[]) {
     this.empleados = empleadosRef;
     this.inicializarEscuchaDetalle();
+    this.inicializarVistaRegistro();
+  }
+
+  private inicializarVistaRegistro(): void {
+    // Configurar input de fecha en vista de registro de gastos
+    if (document.getElementById("fechaGasto")) {
+      configurarInputFecha("fechaGasto");
+    }
   }
 
   private inicializarEscuchaDetalle(): void {
     if (document.getElementById("viewDetalleEmpleado")) {
       this.cargarGastosEmpleado();
       this.setupFiltros();
+
+      // Configurar inputs de fecha en filtros de detalle
+      configurarInputFecha("filtroFecha", false); // Sin valor por defecto aun, se pone hoy en setupFiltros
+      configurarInputFecha("filtroFechaFin", false);
     }
   }
 
@@ -37,11 +50,16 @@ export class GastosController {
     const empleadoId = idInput ? parseInt(idInput.value) : (window as any).appState.currentEmpleadoId;
     const monto = parseFloat(montoInput?.value || "0") || 0;
     let descripcion = descInput?.value.trim() || "Sin descripción";
-    const fecha = fechaInput?.value || new Date().toISOString().split('T')[0];
+    const fecha = fechaInput?.value || obtenerFechaHoy();
     let ruta = rutaInput?.value.trim() || "";
 
     if (!empleadoId || !ruta) {
       this.mostrarAlerta("Campos Requeridos", "Por favor selecciona el empleado y especifica la <strong>Ruta</strong>.");
+      return;
+    }
+
+    if (!validarMonto(monto)) {
+      this.mostrarAlerta("Monto No Válido", "El monto debe ser un número positivo y menor a 1,000,000,000.");
       return;
     }
 
@@ -67,12 +85,10 @@ export class GastosController {
           "Gasto Registrado",
           "¿Deseas ir a la vista de detalles para ver el historial de este empleado?",
           async () => {
-            (window as any).appState.currentEmpleadoId = empleadoId;
-            const btnDetalle = document.createElement("button");
-            btnDetalle.setAttribute("data-view", "usuario/detallesUsuarios.html");
-            document.body.appendChild(btnDetalle);
-            btnDetalle.click();
-            btnDetalle.remove();
+            const event = new CustomEvent("navegar", {
+              detail: { vista: "usuario/detallesUsuarios.html", id: empleadoId }
+            });
+            document.dispatchEvent(event);
           }
         );
       }
@@ -88,7 +104,7 @@ export class GastosController {
 
     const empleadoId = parseInt(selectEmpleado.value);
     const texto = textarea.value.trim();
-    const fecha = inputFecha.value || new Date().toISOString().split('T')[0];
+    const fecha = inputFecha.value || obtenerFechaHoy();
 
 
     const inputRuta = document.getElementById("rutaGasto") as HTMLInputElement | null;
@@ -131,12 +147,10 @@ export class GastosController {
           "Lote Procesado",
           `Se han procesado <strong>${gastosParaGuardar.length}</strong> gastos con éxito. ¿Deseas ir a la vista de detalles para ver el historial de este empleado?`,
           async () => {
-            (window as any).appState.currentEmpleadoId = empleadoId;
-            const btnDetalle = document.createElement("button");
-            btnDetalle.setAttribute("data-view", "usuario/detallesUsuarios.html");
-            document.body.appendChild(btnDetalle);
-            btnDetalle.click();
-            btnDetalle.remove();
+            const event = new CustomEvent("navegar", {
+              detail: { vista: "usuario/detallesUsuarios.html", id: empleadoId }
+            });
+            document.dispatchEvent(event);
           }
         );
       }
@@ -146,7 +160,10 @@ export class GastosController {
 
   private async cargarGastosEmpleado(): Promise<void> {
     const id = (window as any).appState.currentEmpleadoId;
-    if (!id) return;
+    if (!id) {
+      this.mostrarAlerta("Error", "No se pudo identificar el empleado. Por favor regresa al listado y selecciona un empleado.");
+      return;
+    }
     this.gastos = await window.electronAPI.obtenerGastos(id);
     this.renderGastosDetalle();
   }
@@ -177,14 +194,22 @@ export class GastosController {
     });
 
     // Valor por defecto hoy
-    const hoy = new Date().toISOString().split('T')[0];
+    // Valor por defecto hoy
+    const hoy = obtenerFechaHoy();
     if (inputFecha) inputFecha.value = hoy;
     if (inputFechaFin) inputFechaFin.value = hoy;
-    if (inputMes) inputMes.value = new Date().toISOString().slice(0, 7);
+    if (inputMes) inputMes.value = hoy.slice(0, 7);
 
     btnAplicar.addEventListener("click", () => {
       this.renderGastosDetalle(selectTipo.value);
     });
+
+    // Inicializar visibilidad según valor inicial (que ahora es 'todo')
+    if (inputFecha) inputFecha.classList.add("d-none");
+    if (inputFechaFin) inputFechaFin.classList.add("d-none");
+    if (inputMes) inputMes.classList.add("d-none");
+    if (labelDesde) labelDesde.classList.add("d-none");
+    if (labelHasta) labelHasta.classList.add("d-none");
 
     const btnExportar = document.getElementById("btnExportarPDF");
     if (btnExportar) {
@@ -214,7 +239,7 @@ export class GastosController {
         <td class="fw-bold">$${g.monto.toLocaleString()}</td>
         <td class="text-end">
           <button class="btn btn-sm btn-outline-primary btn-editar-gasto me-1" data-id="${g.id}">✏️</button>
-          <button class="btn btn-sm text-danger btn-eliminar-gasto" data-id="${g.id}">🗑️</button>
+          <button class="btn btn-sm btn-outline-danger btn-eliminar-gasto" data-id="${g.id}">🗑️</button>
         </td>
       `;
 
@@ -248,7 +273,7 @@ export class GastosController {
     // Si estamos en la vista de detalle, primero filtramos por el empleado actual
     let list = gastos;
     if (document.getElementById("viewDetalleEmpleado") && currentId) {
-      list = gastos.filter(g => g.empleadoId === currentId);
+      list = gastos.filter(g => Number(g.empleadoId) === Number(currentId));
     }
 
     if (filtro === "todo") return list;
@@ -323,6 +348,9 @@ export class GastosController {
     const modalEl = document.getElementById("editGastoModal");
     if (!modalEl) return;
 
+    // Configurar restricción de fecha antes de establecer el valor
+    configurarInputFecha("editGastoFecha", false);
+
     (document.getElementById("editGastoId") as HTMLInputElement).value = gasto.id.toString();
     (document.getElementById("editGastoFecha") as HTMLInputElement).value = gasto.fecha;
     (document.getElementById("editGastoDescripcion") as HTMLInputElement).value = gasto.descripcion;
@@ -358,26 +386,44 @@ export class GastosController {
     descripcion = toTitleCase(descripcion);
     ruta = toTitleCase(ruta);
 
-    try {
-      const ok = await window.electronAPI.actualizarGasto(id, monto, descripcion, fecha, ruta);
-      if (ok) {
-        // Actualizar en el array local
-        const idx = this.gastos.findIndex(x => x.id === id);
-        if (idx !== -1) {
-          this.gastos[idx] = { ...this.gastos[idx], monto, descripcion, fecha, ruta };
+    // Cerrar la modal de edición antes de mostrar la confirmación
+    // @ts-ignore
+    const modalEditEl = document.getElementById("editGastoModal");
+    const modalEdit = bootstrap.Modal.getInstance(modalEditEl);
+    modalEdit?.hide();
+
+    // Esperar un poco para que la modal se cierre completamente
+    setTimeout(() => {
+      // Mostrar confirmación después de cerrar la modal de edición
+      this.mostrarConfirmacion(
+        "Actualizar Gasto",
+        `¿Estás seguro de que deseas actualizar este gasto?<br><br>
+         <strong>Fecha:</strong> ${fecha}<br>
+         <strong>Concepto:</strong> ${descripcion}<br>
+         <strong>Ruta:</strong> ${ruta}<br>
+         <strong>Monto:</strong> $${monto.toLocaleString()}`,
+        async () => {
+          try {
+            const ok = await window.electronAPI.actualizarGasto(id, monto, descripcion, fecha, ruta);
+            if (ok) {
+              // Actualizar en el array local
+              const idx = this.gastos.findIndex(x => x.id === id);
+              if (idx !== -1) {
+                this.gastos[idx] = { ...this.gastos[idx], monto, descripcion, fecha, ruta };
+              }
+
+              const filtro = (document.getElementById("filtroTipo") as HTMLSelectElement)?.value || "todo";
+              this.renderGastosDetalle(filtro);
+
+              // Mostrar mensaje de éxito
+              this.mostrarAlerta("Éxito", "El gasto ha sido actualizado correctamente.");
+            }
+          } catch (error) {
+            this.mostrarAlerta("Error", "No se pudo guardar el cambio del gasto.");
+          }
         }
-
-        // @ts-ignore
-        const modalEl = document.getElementById("editGastoModal");
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        modal?.hide();
-
-        const filtro = (document.getElementById("filtroTipo") as HTMLSelectElement)?.value || "todo";
-        this.renderGastosDetalle(filtro);
-      }
-    } catch (error) {
-      this.mostrarAlerta("Error", "No se pudo guardar el cambio del gasto.");
-    }
+      );
+    }, 300); // Esperar 300ms para que la animación de cierre termine
   }
 
   private async exportarPDF(filtro: string): Promise<void> {

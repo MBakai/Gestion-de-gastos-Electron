@@ -13,6 +13,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   obtenerEmpleados: (): Promise<Empleado[]> =>
     ipcRenderer.invoke('obtener-empleados'),
 
+  obtenerEmpleadoPorId: (id: number): Promise<Empleado | null> =>
+    ipcRenderer.invoke('obtener-empleado-por-id', id),
+
   actualizarEmpleado: (id: number, empleado: any): Promise<boolean> =>
     ipcRenderer.invoke('actualizar-empleado', id, empleado),
 

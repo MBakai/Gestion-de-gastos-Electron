@@ -1,3 +1,4 @@
+/// <reference path="../interfaces/electron.d.ts" />
 import { SistemaContable } from "./sistema-contable.js";
 import { AuthController } from "./auth.controller.js";
 import { MaintenanceController } from "./maintenance.controller.js";
@@ -39,6 +40,11 @@ async function loadComponents() {
 
 async function loadView(view: string, id?: number) {
   try {
+    // Si se pasa un ID, actualizar el estado global antes de cargar la vista
+    if (id !== undefined) {
+      (window as any).appState.currentEmpleadoId = id;
+    }
+
     const res = await fetch(view);
     if (!res.ok && res.status !== 0) throw new Error(`HTTP error! status: ${res.status}`);
 
@@ -132,6 +138,10 @@ document.addEventListener("click", (e) => {
     const view = target.getAttribute("data-view");
     if (view) {
       e.preventDefault();
+      // Si navegamos a cualquier vista que no sea detalle, limpiar el ID seleccionado
+      if (!view.includes("detallesUsuarios.html")) {
+        (window as any).appState.currentEmpleadoId = null;
+      }
       loadView(view);
 
       // Cerrar el menú colapsable de Bootstrap si está abierto (móvil)
@@ -149,5 +159,7 @@ document.addEventListener("click", (e) => {
 // Listener para navegación programática (desde controladores)
 document.addEventListener("navegar", (e: any) => {
   const { vista, id } = e.detail;
-  loadView(vista, id);
+  // Forzar conversión a número si viene de un data-attribute o similar
+  const numericId = id !== undefined ? Number(id) : undefined;
+  loadView(vista, numericId);
 });
