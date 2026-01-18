@@ -10,9 +10,11 @@
     "watch": "tsc --watch",
     "start": "npm run build && electron .",
     "dev": "npm run build:main && npm run build:renderer && electron . --inspect",
+    "build": "npm run build:main && npm run build:renderer && npm run copy:views",
     "copy:views": "copyfiles -u 1 public/**/* dist/",
     "dist": "npm run build && electron-builder",
     "publish": "npm run build && electron-builder --publish always",
+    "postinstall": "electron-builder install-app-deps",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "build": {
