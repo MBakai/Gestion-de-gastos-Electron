@@ -62,14 +62,15 @@ function setupAutoUpdater(): void {
   });
 
   autoUpdater.on('update-downloaded', async (info) => {
-    const result = await dialog.showMessageBox({
+    const result: any = await dialog.showMessageBox({
       type: 'info',
       title: 'Actualización lista',
       message: `Una nueva versión (${info.version}) ha sido descargada. ¿Deseas reiniciar para aplicar los cambios?`,
       buttons: ['Actualizar ahora', 'Más tarde']
     });
 
-    if (result.response === 0) {
+    const response = typeof result === 'number' ? result : result.response;
+    if (response === 0) {
       autoUpdater.quitAndInstall();
     }
   });
